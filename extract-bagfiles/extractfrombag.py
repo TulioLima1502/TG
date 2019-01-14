@@ -103,3 +103,5 @@ for filename in arquivos:
 
     mydata = align()
     mydata.alinha()
+
+#os.command("python ")
