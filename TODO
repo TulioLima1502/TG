@@ -1,0 +1,22 @@
+o que é c5x, angle, speed, filters, hdf5_camera?
+    c5x -> lista para ligar um banco de dados ao proximo, baseado no seu tamanho.
+    angle -> lista simples com o valor do angulo obtido diretamento do banco de dados(alinhado com o frame)
+    speed -> lista simples com o valor da velocidade obtido diretamento do banco de dados(alinhado com o frame)
+    filters -> lista de valores numéricos respectiva a cada frame, usada para fazer o sorteio dentro do espaço do banco de dados
+    hdf5_camera -> lista de arquivos que o código irá utilizar
+
+    INFO:dask_generator:camera files 2
+    322.86 ms
+    X (200, 1, 3, 160, 320)
+    angle (200, 1, 1)
+    speed (200, 1, 1)
+
+Qual o formato de c5x, angle, speed, filters, hdf5_camera?
+    c5x -> [(0, 30538, <HDF5 dataset "X": shape (30538, 3, 160, 320), type "|u1">), (30538, 75330, <HDF5 dataset "X": shape (44792, 3, 160, 320), type "|u1">)]
+    angle -> [-37.         -37.         -37.         ...  -0.93931226   0.    0.        ]
+    speed -> [ 0.          0.          0.         ... 26.3222985  26.39010745    26.30632874]
+    filters -> [    0     1     2 ... 75327 75328 75329]
+    hdf5_camera -> [<HDF5 file "2016-04-21--14-48-08.h5" (mode r)>, <HDF5 file "2016-06-02--21-39-29.h5" (mode r)>]
+
+Características do código:
+    - dask_generator é utilizada para disponibilizar pacotes dados para que o servidor utilize
