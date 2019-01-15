@@ -49,7 +49,7 @@ for filename in arquivos:
     try:
         os.mkdir(dirTemp)
     except OSError:
-        os.rmdir(dirTemp)
+        shutil.rmtree(dirTemp)
         os.mkdir(dirTemp)
 
     for i in range(num_images):
@@ -68,7 +68,7 @@ for filename in arquivos:
     try:
         os.mkdir(dirTemp)
     except OSError:
-        os.rmdir(dirTemp)
+        shutil.rmtree(dirTemp)
         os.mkdir(dirTemp)
 
     for i in range(num_images):
@@ -87,7 +87,7 @@ for filename in arquivos:
     try:
         os.mkdir(dirTemp)
     except OSError:
-        os.rmdir(dirTemp)
+        shutil.rmtree(dirTemp)
         os.mkdir(dirTemp)
 
     for i in range(num_images):
