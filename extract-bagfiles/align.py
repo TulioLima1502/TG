@@ -69,7 +69,7 @@ class align():
                 shutil.copyfile("../bag-files/cmd_vel/" + str(int(name[0:-4]) - int(sorted(diferenca_cmdvel)[0])) + ".txt", "../bag-files/database_cmdvel/" + name[0:-4] + ".txt")
 
             diferenca_joy = []
-            joy = [arq for arq in os.listdir("joy")]
+            joy = [arq for arq in os.listdir("../bag-files/joy")]
             for comandojoy in sorted(joy):
                 diferenca_joy.append(
                     abs(int(comandojoy[0:-4]) - int(name[0:-4])))
