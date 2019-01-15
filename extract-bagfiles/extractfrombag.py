@@ -101,6 +101,38 @@ for filename in arquivos:
         #print(msg.header.stamp,t)
         shutil.move(str(msg.header.stamp)+".txt", "../bag-files/joy")
 
+    dirTemp = "../bag-files/database_images/"
+
+    try:
+        os.mkdir(dirTemp)
+    except OSError:
+        shutil.rmtree(dirTemp)
+        os.mkdir(dirTemp)
+
+    dirTemp = "../bag-files/database_cmdvel/"
+
+    try:
+        os.mkdir(dirTemp)
+    except OSError:
+        shutil.rmtree(dirTemp)
+        os.mkdir(dirTemp)
+        
+    dirTemp = "../bag-files/database_joy/"
+
+    try:
+        os.mkdir(dirTemp)
+    except OSError:
+        shutil.rmtree(dirTemp)
+        os.mkdir(dirTemp)
+
+    dirTemp = "../bag-files/database_pose/"
+
+    try:
+        os.mkdir(dirTemp)
+    except OSError:
+        shutil.rmtree(dirTemp)
+        os.mkdir(dirTemp)
+
     mydata = align()
     mydata.alinha()
 

@@ -6,37 +6,7 @@ import threading
 
 class align():
     def alinha_arquivos(self, name):
-        dirTemp = "../bag-files/database_images/"
 
-        try:
-            os.mkdir(dirTemp)
-        except OSError:
-            shutil.rmtree(dirTemp)
-            os.mkdir(dirTemp)
-
-        dirTemp = "../bag-files/database_cmdvel/"
-
-        try:
-            os.mkdir(dirTemp)
-        except OSError:
-            shutil.rmtree(dirTemp)
-            os.mkdir(dirTemp)
-        
-        dirTemp = "../bag-files/database_joy/"
-
-        try:
-            os.mkdir(dirTemp)
-        except OSError:
-            shutil.rmtree(dirTemp)
-            os.mkdir(dirTemp)
-
-        dirTemp = "../bag-files/database_pose/"
-
-        try:
-            os.mkdir(dirTemp)
-        except OSError:
-            shutil.rmtree(dirTemp)
-            os.mkdir(dirTemp)
 
         if os.path.isfile("../bag-files/pose/"+name):
             diferenca_images = []
