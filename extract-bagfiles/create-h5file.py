@@ -7,29 +7,29 @@ import numpy
 import h5py
 import cv2
 import matplotlib.pyplot as plt
-from resizeimage import resizeimage
+#from resizeimage import resizeimage
 
 class creatingh5():
 
     def load_data(self,name,index):
-        if os.path.isfile("database_pose/" + name):
-            pose = open("database_pose/" + name, 'r')
+        if os.path.isfile("../bag-files/database_pose/" + name):
+            pose = open("../bag-files/database_pose/" + name, 'r')
             posicao = pose.read()
             #print(posicao)
 
-            if os.path.isfile("database_images/" + name[0:-4] + ".jpeg"):
-                im = Image.open( "database_images/" + name[0:-4] + ".jpeg" )
+            if os.path.isfile("../bag-files/database_images/" + name[0:-4] + ".jpeg"):
+                im = Image.open( "../bag-files/database_images/" + name[0:-4] + ".jpeg" )
                 r,g,b = im.split()
                 #print(numpy.array(list(im.getdata())))
 
-            if os.path.isfile("database_cmdvel/" + name):
-                cmdvel = open("database_cmdvel/" + name, 'r')
+            if os.path.isfile("../bag-files/database_cmdvel/" + name):
+                cmdvel = open("../bag-files/database_cmdvel/" + name, 'r')
                 comando = cmdvel.read()
                 #print(comando)
 
 
-            if os.path.isfile("database_joy/" + name):
-                joystick = open("database_joy/" + name, 'r')
+            if os.path.isfile("../bag-files/database_joy/" + name):
+                joystick = open("../bag-files/database_joy/" + name, 'r')
                 controle = joystick.read()
                 #print(controle)
 
@@ -48,24 +48,24 @@ class creatingh5():
         hdf5_path = h5 + ".h5"
         dt = h5py.special_dtype(vlen=str)
            
-        images = [arq for arq in os.listdir("database_images")]
-        cmd_vel = [arq for arq in os.listdir("database_cmdvel")]
-        position = [arq for arq in os.listdir("database_pose")]
-        joystick = [arq for arq in os.listdir("database_joy")]
+        images = [arq for arq in os.listdir("../bag-files/database_images")]
+        cmd_vel = [arq for arq in os.listdir("../bag-files/database_cmdvel")]
+        position = [arq for arq in os.listdir("../bag-files/database_pose")]
+        joystick = [arq for arq in os.listdir("../bag-files/database_joy")]
 
-        im = cv2.imread( "database_images/" + images[0][0:-5] + ".jpeg" )        
-        plt.imshow(im)
-        plt.show()
+        im = cv2.imread( "../bag-files/database_images/" + images[0][0:-5] + ".jpeg" )        
+        #plt.imshow(im)
+        #plt.show()
         
-        image_shape = ( len(images) , 240 , 320 , im.shape[2] )
+        image_shape = ( len(images) , 480 , 640 , im.shape[2] )
         print(im.shape)
 
         f = h5py.File( hdf5_path , "w")
 
-        f.create_dataset("dataset_images", image_shape, numpy.int8)
-        f.create_dataset("dataset_pose", (len(images),), dtype=dt)
-        f.create_dataset("dataset_joy", (len(images),), dtype=dt)
-        f.create_dataset("dataset_cmdvel", (len(images),), dtype=dt)
+        f.create_dataset("X", image_shape, numpy.int8)
+        f.create_dataset("pose", (len(images),), dtype=dt)
+        f.create_dataset("angle", (len(images),), dtype='float32')
+        f.create_dataset("speed", (len(images),), dtype='float32')
         f.create_dataset("dataset_index", (len(images),), numpy.int32)
         
         print(f.keys())
@@ -74,24 +74,45 @@ class creatingh5():
             if i % 1000 == 0 and i > 1:
                 print 'Train data: {}/{}'.format(i, len(images))
             addr = images[i]
-            im = cv2.imread( "database_images/" + addr )
-            im = cv2.resize(im, (320, 240))
+            im = cv2.imread( "../bag-files/database_images/" + addr )
+            print(im.shape)
+            #im = cv2.resize(im, (320, 240))
+            #exit()
             
-            cmdvel = open("database_cmdvel/" + addr[0:-5] + ".txt", 'r')
+            cmdvel = open("../bag-files/database_cmdvel/" + addr[0:-5] + ".txt", 'r')
             comando = cmdvel.read()
             
-            joystick = open("database_joy/" + addr[0:-5] + ".txt", 'r')
+            joystick = open("../bag-files/database_joy/" + addr[0:-5] + ".txt", 'r')
             controle = joystick.read()
             
-            pose = open("database_pose/" + addr[0:-5] + ".txt", 'r')
+            botao = controle.split()[6]
+            botao = botao.replace('0.0)(',"")
+            botao = botao.replace(',',"")
+            if botao == '1':
+                angulo = controle.split()[0]
+                velocidade = controle.split()[1]
+                angulo = angulo.replace('(',"")
+                angulo = angulo.replace(',',"")
+                velocidade = velocidade.replace(',',"")
+                
+                print('{}'.format(float(angulo)))
+                print('{}'.format(float(velocidade)))
+            else:
+                angulo = 0.0
+                velocidade = 0.0
+                print('{}'.format(float(angulo)))
+                print('{}'.format(float(velocidade)))
+            #separar informacoes em conteudo de velocidade e de angulo
+            
+            pose = open("../bag-files/database_pose/" + addr[0:-5] + ".txt", 'r')
             posicao = pose.read()
             #plt.imshow(im)
             #plt.show()
 
-            f["dataset_images"][i, ...] = im[None]
-            f["dataset_pose"][i, ...] = str(posicao)
-            f["dataset_cmdvel"][i, ...] = str(comando)
-            f["dataset_joy"][i, ...] = str(controle)
+            f["X"][i, ...] = im[None]
+            f["pose"][i, ...] = str(posicao)
+            f["speed"][i, ...] = float(velocidade)
+            f["angle"][i, ...] = float(angulo)
             f["dataset_index"][i, ...] = i
 
             cmdvel.close()
