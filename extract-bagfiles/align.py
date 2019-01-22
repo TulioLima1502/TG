@@ -6,13 +6,14 @@ import threading
 
 class align():
     def alinha_arquivos(self, name):
-
-
         if os.path.isfile("../bag-files/pose/"+name):
             diferenca_images = []
             images = [arq for arq in os.listdir("../bag-files/images")]
             for img in sorted(images):
                 diferenca_images.append(abs(int(img[0:-5]) - int(name[0:-4])))
+                #print(int(img[0:-5]) - int(name[0:-4]))
+                if (int(img[0:-5]) - int(name[0:-4])) > 0:
+                    break
 
             if os.path.isfile("../bag-files/images/" + name[0:-4] + ".jpeg"):
                 shutil.copyfile("../bag-files/images/" + name[0:-4] + ".jpeg", "../bag-files/database_images/" + name[0:-4] + ".jpeg")
@@ -28,6 +29,8 @@ class align():
             for comando in sorted(cmdvel):
                 diferenca_cmdvel.append(
                     abs(int(comando[0:-4]) - int(name[0:-4])))
+                if (int(comando[0:-4]) - int(name[0:-4])) > 0:
+                    break
 
             if os.path.isfile("../bag-files/cmd_vel/" + name[0:-4] + ".txt"):
                 shutil.copyfile("../bag-files/cmd_vel/" + name[0:-4] + ".txt", "../bag-files/database_cmdvel/" + name[0:-4] + ".txt")
@@ -43,6 +46,8 @@ class align():
             for comandojoy in sorted(joy):
                 diferenca_joy.append(
                     abs(int(comandojoy[0:-4]) - int(name[0:-4])))
+                if (int(comandojoy[0:-4]) - int(name[0:-4])) > 0:
+                    break
 
             if os.path.isfile("../bag-files/joy/" + name[0:-4] + ".txt"):
                 shutil.copyfile("../bag-files/joy/" + name[0:-4] + ".txt", "../bag-files/database_joy/" + name[0:-4] + ".txt")
@@ -68,6 +73,6 @@ class align():
             print("Pasta nao encontrada")
         exit()
 
-#if __name__ == '__main__':
-#    mydata = align()
-#    mydata.alinha()
+if __name__ == '__main__':
+    mydata = align()
+    mydata.alinha()
