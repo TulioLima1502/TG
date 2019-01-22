@@ -29,10 +29,10 @@ def concatenate(camera_names, time_len):
         c5 = h5py.File(cword, "r")
         hdf5_camera.append(c5)
         x = c5["X"]
-        c5x.append((lastidx, lastidx+x.shape[0], x))
+        c5x.append((lastidx, lastidx+x.shape[2], x))
 
         speed_value = t5["speed"][:]
-        steering_angle = t5["steering_angle"][:]
+        steering_angle = t5["angle"][:]
         idxs = np.linspace(0, steering_angle.shape[0]-1, x.shape[0]).astype("int")  # approximate alignment
         angle.append(steering_angle[idxs])
         speed.append(speed_value[idxs])
@@ -54,6 +54,7 @@ def concatenate(camera_names, time_len):
   angle = np.concatenate(angle, axis=0)
   speed = np.concatenate(speed, axis=0)
   filters = np.concatenate(filters, axis=0).ravel()
+
   print "training on %d/%d examples" % (filters.shape[0], angle.shape[0])
   return c5x, angle, speed, filters, hdf5_camera
 
@@ -78,7 +79,7 @@ def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False):
 
   logger.info("camera files {}".format(len(c5x)))
 
-  X_batch = np.zeros((batch_size, time_len, 3, 160, 320), dtype='uint8')
+  X_batch = np.zeros((batch_size, time_len, 3, 480, 640), dtype='uint8')
   angle_batch = np.zeros((batch_size, time_len, 1), dtype='float32')
   speed_batch = np.zeros((batch_size, time_len, 1), dtype='float32')
 
@@ -106,7 +107,7 @@ def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False):
         # low quality loop
         for es, ee, x in c5x:
           if i >= es and i < ee:
-            X_batch[count] = x[i-es-time_len+1:i-es+1]
+            X_batch[count] = x[i-es-time_len+1:i-es+1].swapaxes(1,3).swapaxes(2,3)
             break
 
         angle_batch[count] = np.copy(angle[i-time_len+1:i+1])[:, None]
@@ -115,7 +116,7 @@ def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False):
         count += 1
 
       # sanity check
-      assert X_batch.shape == (batch_size, time_len, 3, 160, 320)
+      assert X_batch.shape == (batch_size, time_len, 3, 480, 640)
 
       logging.debug("load image : {}s".format(time.time()-t))
       print("%5.2f ms" % ((time.time()-start)*1000.0))
