@@ -18,3 +18,4 @@ paper/*.out
 paper/*.aux
 paper/commalds.tex.backup
 bag-files/*
+extract-bagfiles/*.rar

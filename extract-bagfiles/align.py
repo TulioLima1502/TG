@@ -73,6 +73,6 @@ class align():
             print("Pasta nao encontrada")
         exit()
 
-if __name__ == '__main__':
-    mydata = align()
-    mydata.alinha()
+#if __name__ == '__main__':
+#    mydata = align()
+#    mydata.alinha()
