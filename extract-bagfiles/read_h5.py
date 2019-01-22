@@ -2,34 +2,35 @@ import h5py
 import time
 from PIL import Image
 import matplotlib.pyplot as plt
+from scipy.misc import imshow
+import numpy
+import PIL
+import pygame
+from pygame import surfarray
+import cv2
 
-
-camera = h5py.File("camera/2016-06-08--11-46-01.h5", "r")
-log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-
+camera = h5py.File("segundo.h5", "r")
 a_group_key = list(camera.keys())[0]
-b_group_key = list(log.keys())[0]
 
 print camera['X'].shape
 
-plt.ion()
-for i in range(0, log['times'].shape[0]):
+pygame.init()
+size = (640, 480)
+pygame.display.set_caption("comma.ai data viewer")
+screen = pygame.display.set_mode(size)
 
-    angle_steers = log['steering_angle'][i]
-    speed_ms = log['speed'][i]
+camera_surface = pygame.surface.Surface((640,480),0,24).convert()
 
-    #print(i,log['cam1_ptr'][i],angle_steers,speed_ms)
+for i in range(0, camera['X'].shape[0]):
 
-    imagem = camera['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
+    angle_steers = camera['angle'][i]
+    speed_ms = camera['speed'][i]
 
-    #imgr = Image.fromarray(imagem[0],mode=None)
-    #imgg = Image.fromarray(imagem[1],mode=None)
-    #imgb = Image.fromarray(imagem[2],mode=None)
+    imagem = camera['X'][i]
+    #imshow(imagem)
 
-    #merged=Image.merge("RGB",(imgr,imgg,imgb))
-    imgplot = plt.imshow(imagem)
-    plt.show()
-    #plt.draw()
-    plt.pause(0.00001)
-    plt.clf()
-
+    pygame.surfarray.blit_array(camera_surface, imagem.swapaxes(0,1))
+    #camera_surface_2x = pygame.transform.scale2x(camera_surface)
+    screen.blit(camera_surface, (0,0))
+    pygame.display.flip()
+    #time.sleep(1)
