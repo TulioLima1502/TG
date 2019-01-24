@@ -8,11 +8,11 @@ import json
 #from keras.models import model_from_json
 
 pygame.init()
-size = (320*2, 160*2)
+size = (640, 480)
 pygame.display.set_caption("comma.ai data viewer")
-screen = pygame.display.set_mode(size, pygame.DOUBLEBUF)
+screen = pygame.display.set_mode(size)
 
-camera_surface = pygame.surface.Surface((320,160),0,24).convert()
+camera_surface = pygame.surface.Surface((640,480),0,24).convert()
 
 # ***** get perspective transform for images *****
 from skimage import transform as tf
@@ -52,7 +52,7 @@ def draw_pt(img, x, y, color, sz=1):
   row, col = perspective_tform(x, y)
   if row >= 0 and row < img.shape[0] and\
      col >= 0 and col < img.shape[1]:
-    img[row-sz:row+sz, col-sz:col+sz] = color
+    img[int(row)-int(sz):int(row)+int(sz), int(col)-int(sz):int(col)+int(sz)] = color
 
 def draw_path(img, path_x, path_y, color):
   for x, y in zip(path_x, path_y):
@@ -68,7 +68,7 @@ def calc_curvature(v_ego, angle_steers, angle_offset=0):
 
   angle_steers_rad = (angle_steers - angle_offset) * deg_to_rad
   curvature = angle_steers_rad/(steer_ratio * wheel_base * (1. + slip_fator * v_ego**2))
-  return curvature
+  return -angle_steers
 
 def calc_lookahead_offset(v_ego, angle_steers, d_lookahead, angle_offset=0):
   #*** this function returns the lateral offset given the steering angle, speed and the lookahead distance
@@ -79,7 +79,7 @@ def calc_lookahead_offset(v_ego, angle_steers, d_lookahead, angle_offset=0):
   return y_actual, curvature
 
 def draw_path_on(img, speed_ms, angle_steers, color=(0,0,255)):
-  path_x = np.arange(0., 50.1, 0.5)
+  path_x = np.arange(0., 100.1, 0.5)
   path_y, _ = calc_lookahead_offset(speed_ms, angle_steers, path_x)
   draw_path(img, path_x, path_y, color)
 
@@ -101,27 +101,27 @@ if __name__ == "__main__":
   #dataset = args.dataset
   skip = 300
 
-  log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-  cam = h5py.File("camera/2016-06-08--11-46-01.h5", "r")
+  #log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
+  cam = h5py.File("primeiro.h5", "r")
 
-  print log.keys()
+  print cam.keys()
 
   # skip to highway
-  for i in range(0, log['times'].shape[0]):
+  for i in range(0, cam['X'].shape[0]):
     #if i%100 == 0:
     #  print "%.2f seconds elapsed" % (i/100.0)
-    img = cam['X'][log['cam1_ptr'][i]].swapaxes(0,2).swapaxes(0,1)
+    img = cam['X'][i]
 
     #predicted_steers = model.predict(img[None, :, :, :].transpose(0, 3, 1, 2))[0][0]
 
-    angle_steers = log['steering_angle'][i]
-    speed_ms = log['speed'][i]
+    angle_steers = cam['angle'][i]
+    speed_ms = cam['speed'][i]
     print(angle_steers,speed_ms)
-    draw_path_on(img, speed_ms, -angle_steers/10.0)
+    draw_path_on(img, speed_ms, -angle_steers)
     #draw_path_on(img, speed_ms, -predicted_steers/10.0, (0, 255, 0))
 
     # draw on
     pygame.surfarray.blit_array(camera_surface, img.swapaxes(0,1))
-    camera_surface_2x = pygame.transform.scale2x(camera_surface)
-    screen.blit(camera_surface_2x, (0,0))
+    #camera_surface_2x = pygame.transform.scale2x(camera_surface)
+    screen.blit(camera_surface, (0,0))
     pygame.display.flip()

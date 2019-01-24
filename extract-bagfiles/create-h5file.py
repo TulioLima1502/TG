@@ -7,6 +7,8 @@ import numpy
 import h5py
 import cv2
 import matplotlib.pyplot as plt
+import imutils
+
 #from resizeimage import resizeimage
 
 class creatingh5():
@@ -53,9 +55,11 @@ class creatingh5():
         position = [arq for arq in os.listdir("../bag-files/database_pose")]
         joystick = [arq for arq in os.listdir("../bag-files/database_joy")]
 
-        im = cv2.imread( "../bag-files/database_images/" + images[0][0:-5] + ".jpeg" )        
-        #plt.imshow(im)
-        #plt.show()
+        im = cv2.imread( "../bag-files/database_images/" + images[0][0:-5] + ".jpeg" )
+        im = imutils.rotate(im, 180)
+        #im = im.swapaxes(0,2).swapaxes(1,2)
+        plt.imshow(im)
+        plt.show()
         
         image_shape = ( len(images) , 480 , 640 , im.shape[2] )
         print(im.shape)
@@ -75,6 +79,7 @@ class creatingh5():
                 print 'Train data: {}/{}'.format(i, len(images))
             addr = images[i]
             im = cv2.imread( "../bag-files/database_images/" + addr )
+            im = imutils.rotate(im, 180)
             print(im.shape)
             #im = cv2.resize(im, (320, 240))
             #exit()
