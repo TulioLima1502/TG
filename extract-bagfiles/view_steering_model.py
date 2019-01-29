@@ -4,15 +4,26 @@ import sys
 import numpy as np
 import h5py
 import pygame
+from pygame.locals import *
 import json
+import math
+import matplotlib.pyplot as plt
 #from keras.models import model_from_json
 
 pygame.init()
 size = (640, 480)
+
 pygame.display.set_caption("comma.ai data viewer")
 screen = pygame.display.set_mode(size)
 
 camera_surface = pygame.surface.Surface((640,480),0,24).convert()
+
+dimensions = [640, 480]
+orientation = pygame.display.set_mode(dimensions)
+
+orientation.fill((255, 255, 255))
+
+circulo = [10, 10, 100, 100]
 
 # ***** get perspective transform for images *****
 from skimage import transform as tf
@@ -105,6 +116,20 @@ if __name__ == "__main__":
   cam = h5py.File("primeiro.h5", "r")
 
   print cam.keys()
+  graph_x = [0]
+  graph_y = [0]
+  position_x = []
+  position_y = []
+  angulos = [0]
+  plt.figure("angulo")
+  plt.plot(graph_x,graph_y)
+  plt.ylabel('Estercamento (-1 a 1)')
+  plt.xlabel('Amostras')
+  #plt.show()
+  plt.pause(0.00001)
+  plt.clf()
+
+  angulo_aux = 0
 
   # skip to highway
   for i in range(0, cam['X'].shape[0]):
@@ -116,12 +141,47 @@ if __name__ == "__main__":
 
     angle_steers = cam['angle'][i]
     speed_ms = cam['speed'][i]
-    print(angle_steers,speed_ms)
-    draw_path_on(img, speed_ms, -angle_steers)
+    #print(angle_steers,speed_ms)
+    
+    #draw_path_on(img, speed_ms, -angle_steers)
     #draw_path_on(img, speed_ms, -predicted_steers/10.0, (0, 255, 0))
 
     # draw on
     pygame.surfarray.blit_array(camera_surface, img.swapaxes(0,1))
     #camera_surface_2x = pygame.transform.scale2x(camera_surface)
     screen.blit(camera_surface, (0,0))
+
+    pygame.draw.ellipse(orientation, (0, 0, 0), circulo, 2)
+    x = angle_steers
+    y = math.sqrt(1 - (x*x))
+    if x!=0:
+      angulo = math.degrees(math.atan(abs(y/x)))
+    else:
+      angulo = 90
+    if x<=0:
+      angulo = 180 - angulo
+    x = 60 - 50 * math.cos(math.radians(angulo))
+    y = 60 - 50 * math.sin(math.radians(angulo))
+    
+    graph_x.append(i)
+    graph_y.append(angle_steers)
+
+    #position_x.append(float((position.split()[2]).replace("'","")))
+    #position_y.append(float((position.split()[4]).replace("'","")))
+      
+    plt.figure("angulo")
+      #plt.subplot(211)
+    plt.plot(graph_x,graph_y,'b-')
+    plt.ylabel('Estercamento (-1 a 1)')
+    plt.xlabel('Amostras')
+      #plt.show()
+
+      #print position_x, position_y
+      #plt.subplot(212)
+      #plt.plot(position_x[i-200:i],position_y[i-200:i])
+    plt.pause(0.00001)
+    plt.clf()
+
+      
+    pygame.draw.line(orientation, (255, 0, 0), [60, 60], [x, y], 1)
     pygame.display.flip()
