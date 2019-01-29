@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
   # 2 for validation
   validation_path = [
-    './extract-bagfiles/segundo.h5',
+    './extract-bagfiles/primeiro.h5',
   ]
 
   if args.validation:
