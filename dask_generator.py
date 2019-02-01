@@ -29,7 +29,7 @@ def concatenate(camera_names, time_len):
         c5 = h5py.File(cword, "r")
         hdf5_camera.append(c5)
         x = c5["X"]
-        c5x.append((lastidx, lastidx+x.shape[2], x))
+        c5x.append((lastidx, lastidx+x.shape[0], x))
 
         speed_value = t5["speed"][:]
         steering_angle = t5["angle"][:]
@@ -54,7 +54,7 @@ def concatenate(camera_names, time_len):
   angle = np.concatenate(angle, axis=0)
   speed = np.concatenate(speed, axis=0)
   filters = np.concatenate(filters, axis=0).ravel()
-
+  
   print "training on %d/%d examples" % (filters.shape[0], angle.shape[0])
   return c5x, angle, speed, filters, hdf5_camera
 
@@ -107,7 +107,7 @@ def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False):
         # low quality loop
         for es, ee, x in c5x:
           if i >= es and i < ee:
-            X_batch[count] = x[i-es-time_len+1:i-es+1].swapaxes(1,3).swapaxes(2,3)
+            X_batch[count] = x[i-es-time_len+1:i-es+1]
             break
 
         angle_batch[count] = np.copy(angle[i-time_len+1:i+1])[:, None]

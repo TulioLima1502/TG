@@ -3,6 +3,7 @@
 Steering angle prediction model
 """
 import os
+os.environ['KERAS_BACKEND'] = 'tensorflow'
 import argparse
 import json
 from keras.models import Sequential

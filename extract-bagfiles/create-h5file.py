@@ -61,7 +61,7 @@ class creatingh5():
         plt.imshow(im)
         plt.show()
         
-        image_shape = ( len(images) , 480 , 640 , im.shape[2] )
+        image_shape = ( len(images) , im.shape[2], 480 , 640)
         print(im.shape)
 
         f = h5py.File( hdf5_path , "w")
@@ -114,7 +114,7 @@ class creatingh5():
             #plt.imshow(im)
             #plt.show()
 
-            f["X"][i, ...] = im[None]
+            f["X"][i, ...] = im[None].swapaxes(1,3).swapaxes(2,3)
             f["pose"][i, ...] = str(posicao)
             f["speed"][i, ...] = float(velocidade)
             f["angle"][i, ...] = float(angulo)
