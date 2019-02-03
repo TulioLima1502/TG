@@ -6,9 +6,11 @@ import h5py
 import pygame
 from pygame.locals import *
 import json
+import os
+os.environ['KERAS_BACKEND'] = 'tensorflow'
 import math
 import matplotlib.pyplot as plt
-#from keras.models import model_from_json
+from keras.models import model_from_json
 
 pygame.init()
 size = (640, 480)
@@ -96,24 +98,24 @@ def draw_path_on(img, speed_ms, angle_steers, color=(0,0,255)):
 
 # ***** main loop *****
 if __name__ == "__main__":
-  #parser = argparse.ArgumentParser(description='Path viewer')
-  #parser.add_argument('model', type=str, help='Path to model definition json. Model weights should be on the same path.')
-  #parser.add_argument('--dataset', type=str, default="2016-06-08--11-46-01", help='Dataset/video clip name')
-  #args = parser.parse_args()
+  parser = argparse.ArgumentParser(description='Path viewer')
+  parser.add_argument('model', type=str, help='Path to model definition json. Model weights should be on the same path.')
+  parser.add_argument('--dataset', type=str, default="segundo.h5", help='Dataset/video clip name')
+  args = parser.parse_args()
 
-  #with open(args.model, 'r') as jfile:
-  #  model = model_from_json(json.load(jfile))
+  with open(args.model, 'r') as jfile:
+    model = model_from_json(json.load(jfile))
 
-  #model.compile("sgd", "mse")
-  #weights_file = args.model.replace('json', 'keras')
-  #model.load_weights(weights_file)
+  model.compile("sgd", "mse")
+  weights_file = args.model.replace('json', 'keras')
+  model.load_weights(weights_file)
 
   # default dataset is the validation data on the highway
-  #dataset = args.dataset
+  dataset = args.dataset
   skip = 300
 
   #log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-  cam = h5py.File("primeiro.h5", "r")
+  cam = h5py.File("segundo.h5", "r")
 
   print cam.keys()
   graph_x = [0]
@@ -128,26 +130,28 @@ if __name__ == "__main__":
   #plt.show()
   plt.pause(0.00001)
   plt.clf()
-
+  #exit()
   angulo_aux = 0
 
   # skip to highway
-  for i in range(0, cam['X'].shape[0]):
+  for i in range(3000, cam['X'].shape[0]):
     #if i%100 == 0:
     #  print "%.2f seconds elapsed" % (i/100.0)
     img = cam['X'][i]
-
-    #predicted_steers = model.predict(img[None, :, :, :].transpose(0, 3, 1, 2))[0][0]
+    #print img[None, :, :, :].transpose(0, 3, 1, 2)
+    predicted_steers = model.predict(img[None, :, :, :].transpose(0, 1, 2, 3))[0][0]
+    #print predicted_steers
 
     angle_steers = cam['angle'][i]
     speed_ms = cam['speed'][i]
     #print(angle_steers,speed_ms)
     
-    #draw_path_on(img, speed_ms, -angle_steers)
+    #draw_path_on(img, speed_ms, -angle_steers/10.0)
     #draw_path_on(img, speed_ms, -predicted_steers/10.0, (0, 255, 0))
 
     # draw on
-    pygame.surfarray.blit_array(camera_surface, img.swapaxes(0,1))
+    print img.shape
+    pygame.surfarray.blit_array(camera_surface, img.swapaxes(0, 2))
     #camera_surface_2x = pygame.transform.scale2x(camera_surface)
     screen.blit(camera_surface, (0,0))
 
@@ -169,19 +173,37 @@ if __name__ == "__main__":
     #position_x.append(float((position.split()[2]).replace("'","")))
     #position_y.append(float((position.split()[4]).replace("'","")))
       
-    plt.figure("angulo")
+    #plt.figure("angulo")
       #plt.subplot(211)
-    plt.plot(graph_x,graph_y,'b-')
-    plt.ylabel('Estercamento (-1 a 1)')
-    plt.xlabel('Amostras')
+    #plt.plot(graph_x,graph_y,'b-')
+    #plt.ylabel('Estercamento (-1 a 1)')
+    #plt.xlabel('Amostras')
       #plt.show()
 
       #print position_x, position_y
       #plt.subplot(212)
       #plt.plot(position_x[i-200:i],position_y[i-200:i])
-    plt.pause(0.00001)
-    plt.clf()
+    #plt.pause(0.00001)
+    #plt.clf()
 
       
     pygame.draw.line(orientation, (255, 0, 0), [60, 60], [x, y], 1)
+
+    x = predicted_steers
+    y = math.sqrt(1 - (x*x))
+    if x!=0:
+      angulo = math.degrees(math.atan(abs(y/x)))
+    else:
+      angulo = 90
+    if x<=0:
+      angulo = 180 - angulo
+    x = 60 - 50 * math.cos(math.radians(angulo))
+    y = 60 - 50 * math.sin(math.radians(angulo))
+    
+    #graph_x.append(i)
+    #graph_y.append(angle_steers)
+
+    print angle_steers,predicted_steers
+    
+    pygame.draw.line(orientation, (0, 255, 0), [60, 60], [x, y], 1)
     pygame.display.flip()

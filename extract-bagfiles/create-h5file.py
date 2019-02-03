@@ -61,7 +61,7 @@ class creatingh5():
         plt.imshow(im)
         plt.show()
         
-        image_shape = ( len(images) , im.shape[2], 480 , 640)
+        image_shape = ( len(images) , im.shape[2], 240 , 320)
         print(im.shape)
 
         f = h5py.File( hdf5_path , "w")
@@ -81,7 +81,7 @@ class creatingh5():
             im = cv2.imread( "../bag-files/database_images/" + addr )
             im = imutils.rotate(im, 180)
             print(im.shape)
-            #im = cv2.resize(im, (320, 240))
+            im = cv2.resize(im, (320, 240))
             #exit()
             
             cmdvel = open("../bag-files/database_cmdvel/" + addr[0:-5] + ".txt", 'r')
