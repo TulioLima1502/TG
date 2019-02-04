@@ -10,7 +10,7 @@ from PIL import Image
 import shutil
 import os
 import threading
-from alignimage import align
+from alignjoy import align
 
 caminhos = [os.path.join("../bag-files", nome) for nome in os.listdir("../bag-files")]
 arquivos = [arq for arq in caminhos if os.path.isfile(arq)]
