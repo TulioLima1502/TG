@@ -31,7 +31,7 @@ class creatingh5():
         plt.imshow(im)
         plt.show()
         
-        image_shape = ( len(images) , im.shape[2], 240 , 320)
+        image_shape = ( len(images) , im.shape[2], 480 , 640)
         print(im.shape)
 
         f = h5py.File( hdf5_path , "w")
@@ -49,9 +49,10 @@ class creatingh5():
                 print 'Train data: {}/{}'.format(i, len(images))
             addr = images[i]
             im = cv2.imread( "../bag-files/database_images/" + addr )
+            print addr
             im = imutils.rotate(im, 180)
             print(im.shape)
-            im = cv2.resize(im, (320, 240))
+            #im = cv2.resize(im, (320, 240))
             #exit()
             
             cmdvel = open("../bag-files/database_cmdvel/" + addr[0:-5] + ".txt", 'r')
@@ -87,6 +88,7 @@ class creatingh5():
             f["X"][i, ...] = im[None].swapaxes(1,3).swapaxes(2,3)
             #f["pose"][i, ...] = str(posicao)
             f["speed"][i, ...] = float(velocidade)
+            #new_angulo = -5023 + (5023 + 5023)*((float(angulo) + 1)/(2))
             f["angle"][i, ...] = float(angulo)
             f["dataset_index"][i, ...] = i
 
