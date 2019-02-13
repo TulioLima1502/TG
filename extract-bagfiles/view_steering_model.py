@@ -13,14 +13,14 @@ import matplotlib.pyplot as plt
 from keras.models import model_from_json
 
 pygame.init()
-size = (640, 480)
+size = (320, 240)
 
 pygame.display.set_caption("comma.ai data viewer")
 screen = pygame.display.set_mode(size)
 
-camera_surface = pygame.surface.Surface((640,480),0,24).convert()
+camera_surface = pygame.surface.Surface((320,240),0,24).convert()
 
-dimensions = [640, 480]
+dimensions = [320, 240]
 orientation = pygame.display.set_mode(dimensions)
 
 orientation.fill((255, 255, 255))
@@ -140,9 +140,11 @@ if __name__ == "__main__":
     img = cam['X'][i]
     #print img[None, :, :, :].transpose(0, 3, 1, 2)
     predicted_steers = model.predict(img[None, :, :, :].transpose(0, 1, 2, 3))[0][0]
+    #predicted_steers = -1 + (1 + 1)*((predicted_steers + 5023)/(5023+5023))
     #print predicted_steers
 
     angle_steers = cam['angle'][i]
+    #angle_steers = -1 + (1 + 1)*((angle_steers + 5023)/(5023+5023))
     speed_ms = cam['speed'][i]
     #print(angle_steers,speed_ms)
     

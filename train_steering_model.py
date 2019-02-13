@@ -3,7 +3,6 @@
 Steering angle prediction model
 """
 import os
-os.environ['KERAS_BACKEND'] = 'tensorflow'
 import argparse
 import json
 from keras.models import Sequential
@@ -23,7 +22,7 @@ def gen(hwm, host, port):
 
 
 def get_model(time_len=1):
-  ch, row, col = 3, 480, 640  # camera format
+  ch, row, col = 3, 240, 320  # camera format
 
   model = Sequential()
   model.add(Lambda(lambda x: x/127.5 - 1.,
