@@ -7,7 +7,7 @@ import pygame
 from pygame.locals import *
 import json
 import os
-os.environ['KERAS_BACKEND'] = 'tensorflow'
+#os.environ['KERAS_BACKEND'] = 'tensorflow'
 import math
 import matplotlib.pyplot as plt
 from keras.models import model_from_json
@@ -115,50 +115,50 @@ if __name__ == "__main__":
   skip = 300
 
   #log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-  cam = h5py.File("segundo.h5", "r")
+  cam = h5py.File("primeiro.h5", "r")
 
   print cam.keys()
-  graph_x = [0]
-  graph_y = [0]
+  graph_x = np.array(0)
+  graph_y = np.array(0)
+  graph_pred = np.array(0)
   position_x = []
   position_y = []
   angulos = [0]
-  plt.figure("angulo")
-  plt.plot(graph_x,graph_y)
-  plt.ylabel('Estercamento (-1 a 1)')
-  plt.xlabel('Amostras')
+  #plt.figure("angulo")
+  #plt.plot(graph_x,graph_y)
+  #plt.ylabel('Estercamento (-1 a 1)')
+  #plt.xlabel('Amostras')
   #plt.show()
-  plt.pause(0.00001)
-  plt.clf()
+  #plt.pause(0.00001)
+  #plt.clf()
   #exit()
   angulo_aux = 0
 
   # skip to highway
-  for i in range(3000, cam['X'].shape[0]):
+  for i in range(0, cam['X'].shape[0]):
     #if i%100 == 0:
     #  print "%.2f seconds elapsed" % (i/100.0)
     img = cam['X'][i]
     #print img[None, :, :, :].transpose(0, 3, 1, 2)
     predicted_steers = model.predict(img[None, :, :, :].transpose(0, 1, 2, 3))[0][0]
+    predicted_steers = predicted_steers/507.45
     #predicted_steers = -1 + (1 + 1)*((predicted_steers + 5023)/(5023+5023))
     #print predicted_steers
 
     angle_steers = cam['angle'][i]
+    angle_steers = angle_steers/507.45
     #angle_steers = -1 + (1 + 1)*((angle_steers + 5023)/(5023+5023))
     speed_ms = cam['speed'][i]
-    #print(angle_steers,speed_ms)
-    
-    #draw_path_on(img, speed_ms, -angle_steers/10.0)
-    #draw_path_on(img, speed_ms, -predicted_steers/10.0, (0, 255, 0))
-
-    # draw on
     print img.shape
     pygame.surfarray.blit_array(camera_surface, img.swapaxes(0, 2))
-    #camera_surface_2x = pygame.transform.scale2x(camera_surface)
     screen.blit(camera_surface, (0,0))
 
     pygame.draw.ellipse(orientation, (0, 0, 0), circulo, 2)
     x = angle_steers
+    if x > 1.0:
+      x=1
+    elif x < -1.0:
+      x=-1
     y = math.sqrt(1 - (x*x))
     if x!=0:
       angulo = math.degrees(math.atan(abs(y/x)))
@@ -169,29 +169,16 @@ if __name__ == "__main__":
     x = 60 - 50 * math.cos(math.radians(angulo))
     y = 60 - 50 * math.sin(math.radians(angulo))
     
-    graph_x.append(i)
-    graph_y.append(angle_steers)
-
-    #position_x.append(float((position.split()[2]).replace("'","")))
-    #position_y.append(float((position.split()[4]).replace("'","")))
-      
-    #plt.figure("angulo")
-      #plt.subplot(211)
-    #plt.plot(graph_x,graph_y,'b-')
-    #plt.ylabel('Estercamento (-1 a 1)')
-    #plt.xlabel('Amostras')
-      #plt.show()
-
-      #print position_x, position_y
-      #plt.subplot(212)
-      #plt.plot(position_x[i-200:i],position_y[i-200:i])
-    #plt.pause(0.00001)
-    #plt.clf()
-
-      
+    graph_x = np.append(graph_x,i)
+    graph_y = np.append(graph_y,angle_steers)
+     
     pygame.draw.line(orientation, (255, 0, 0), [60, 60], [x, y], 1)
 
     x = predicted_steers
+    if x > 1.0:
+      x=1
+    elif x < -1.0:
+      x=-1
     y = math.sqrt(1 - (x*x))
     if x!=0:
       angulo = math.degrees(math.atan(abs(y/x)))
@@ -202,10 +189,19 @@ if __name__ == "__main__":
     x = 60 - 50 * math.cos(math.radians(angulo))
     y = 60 - 50 * math.sin(math.radians(angulo))
     
-    #graph_x.append(i)
-    #graph_y.append(angle_steers)
-
+    graph_pred = np.append(graph_pred,predicted_steers)
     print angle_steers,predicted_steers
     
     pygame.draw.line(orientation, (0, 255, 0), [60, 60], [x, y], 1)
     pygame.display.flip()
+    print np.sqrt(((graph_pred - angle_steers) ** 2).mean())/2
+
+plt.figure("angulo")
+plt.plot(graph_x,graph_y,'b-')
+plt.ylabel('Estercamento (-1 a 1)')
+plt.xlabel('Amostras')
+
+plt.figure("angulo_pred")
+plt.plot(graph_x,graph_pred,'b-')
+plt.ylabel('Estercamento (-1 a 1)')
+plt.xlabel('Amostras')
