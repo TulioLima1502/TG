@@ -37,7 +37,7 @@ def concatenate(camera_names, time_len):
         angle.append(steering_angle[idxs])
         speed.append(speed_value[idxs])
 
-        goods = np.abs(angle[-1]) <= 200
+        goods = np.abs(angle[-1]) <= 600
 
         filters.append(np.argwhere(goods)[time_len-1:] + (lastidx+time_len-1))
         lastidx += goods.shape[0]
@@ -53,7 +53,9 @@ def concatenate(camera_names, time_len):
 
   angle = np.concatenate(angle, axis=0)
   speed = np.concatenate(speed, axis=0)
+  #print(filters)
   filters = np.concatenate(filters, axis=0).ravel()
+  print angle.shape[0], speed.shape[0], filters.shape[0]
   
   print "training on %d/%d examples" % (filters.shape[0], angle.shape[0])
   return c5x, angle, speed, filters, hdf5_camera
@@ -62,7 +64,7 @@ def concatenate(camera_names, time_len):
 first = True
 
 
-def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False):
+def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False, data_set=None):
   """
   Parameters:
   -----------
@@ -83,6 +85,17 @@ def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False):
   angle_batch = np.zeros((batch_size, time_len, 1), dtype='float32')
   speed_batch = np.zeros((batch_size, time_len, 1), dtype='float32')
 
+  DataIndex = []
+  Data = []
+
+  if data_set is not None:
+    #print data_set
+    DataFileTrain = open("TrainData.txt", "r")
+    Data = DataFileTrain.readlines()
+    for a in Data:
+      DataIndex.append(int(a))
+    filters = DataIndex
+
   while True:
     try:
       t = time.time()
@@ -91,7 +104,15 @@ def datagen(filter_files, time_len=1, batch_size=256, ignore_goods=False):
       start = time.time()
       while count < batch_size:
         if not ignore_goods:
+          #i = np.random.choice(angle.shape[0])
           i = np.random.choice(filters)
+          #numberx = 0
+          #for number in filters:
+          #  if numberx - int(number) != 0:
+          #    print number
+          #    print numberx
+          #    time.sleep(0.03)
+          #  numberx=numberx+1
           # check the time history for goods
           good = True
           for j in (i-time_len+1, i+1):

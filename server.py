@@ -181,15 +181,18 @@ if __name__ == "__main__":
   parser.add_argument('--leads', dest='leads', action='store_true', default=False, help='Use x, y and speed radar lead info.')
   parser.add_argument('--nogood', dest='nogood', action='store_true', default=False, help='Ignore `goods` filters.')
   parser.add_argument('--validation', dest='validation', action='store_true', default=False, help='Serve validation dataset instead.')
+  parser.add_argument('--list', dest='DataTrainAndTest', action='store', help='Set a list of indices with divided dataset to train and test')
   args, more = parser.parse_known_args()
 
   # 9 for training
   train_path = [
     './extract-bagfiles/segundo.h5',
+    './extract-bagfiles/primeiro.h5',
   ]
 
   # 2 for validation
   validation_path = [
+    './extract-bagfiles/segundo.h5',
     './extract-bagfiles/primeiro.h5',
   ]
 
@@ -198,6 +201,6 @@ if __name__ == "__main__":
   else:
     datapath = train_path
 
-  gen = datagen(datapath, time_len=args.time, batch_size=args.batch, ignore_goods=args.nogood)
+  gen = datagen(datapath, time_len=args.time, batch_size=args.batch, ignore_goods=args.nogood, data_set=args.DataTrainAndTest )
   start_server(gen, port=args.port, hwm=args.buffer)
 
