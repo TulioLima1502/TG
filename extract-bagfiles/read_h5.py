@@ -9,7 +9,7 @@ import pygame
 from pygame import surfarray
 import cv2
 
-camera = h5py.File("segundo.h5", "r")
+camera = h5py.File("primeironp.h5", "r")
 a_group_key = list(camera.keys())[0]
 
 print camera['X'].shape
@@ -28,8 +28,8 @@ for i in range(0, camera['X'].shape[0]):
 
     imagem = camera['X'][i]
     #imshow(imagem)
-
-    pygame.surfarray.blit_array(camera_surface, imagem.swapaxes(0,1))
+    print imagem.shape
+    pygame.surfarray.blit_array(camera_surface, imagem.swapaxes(0,2))
     #camera_surface_2x = pygame.transform.scale2x(camera_surface)
     screen.blit(camera_surface, (0,0))
     pygame.display.flip()

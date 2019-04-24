@@ -11,6 +11,8 @@ import os
 import math
 import matplotlib.pyplot as plt
 from keras.models import model_from_json
+import random
+import time
 
 pygame.init()
 size = (320, 240)
@@ -100,7 +102,7 @@ def draw_path_on(img, speed_ms, angle_steers, color=(0,0,255)):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Path viewer')
   parser.add_argument('model', type=str, help='Path to model definition json. Model weights should be on the same path.')
-  parser.add_argument('--dataset', type=str, default="segundo.h5", help='Dataset/video clip name')
+  parser.add_argument('--dataset', type=str, default="terceiro-curvas.h5", help='Dataset/video clip name')
   args = parser.parse_args()
 
   with open(args.model, 'r') as jfile:
@@ -115,7 +117,7 @@ if __name__ == "__main__":
   skip = 300
 
   #log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-  cam = h5py.File("primeiro.h5", "r")
+  cam = h5py.File("terceiro-curvas.h5", "r")
 
   print cam.keys()
   graph_x = np.array(0)
@@ -135,7 +137,13 @@ if __name__ == "__main__":
   angulo_aux = 0
 
   # skip to highway
-  for i in range(0, cam['X'].shape[0]):
+  #for i in range(0, cam['X'].shape[0]):
+  randoms = []
+  randoms = range(0, cam['X'].shape[0])
+  random.shuffle(randoms)
+  #print randoms
+  for i in randoms:
+
     #if i%100 == 0:
     #  print "%.2f seconds elapsed" % (i/100.0)
     img = cam['X'][i]
@@ -149,7 +157,7 @@ if __name__ == "__main__":
     angle_steers = angle_steers/507.45
     #angle_steers = -1 + (1 + 1)*((angle_steers + 5023)/(5023+5023))
     speed_ms = cam['speed'][i]
-    print img.shape
+    print img.shape , cam['dataset_index'][i]
     pygame.surfarray.blit_array(camera_surface, img.swapaxes(0, 2))
     screen.blit(camera_surface, (0,0))
 
@@ -195,6 +203,8 @@ if __name__ == "__main__":
     pygame.draw.line(orientation, (0, 255, 0), [60, 60], [x, y], 1)
     pygame.display.flip()
     print np.sqrt(((graph_pred - angle_steers) ** 2).mean())/2
+
+    time.sleep(1)
 
 plt.figure("angulo")
 plt.plot(graph_x,graph_y,'b-')
