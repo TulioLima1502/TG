@@ -117,7 +117,7 @@ if __name__ == "__main__":
   skip = 300
 
   #log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-  cam = h5py.File("terceiro-curvas.h5", "r")
+  cam = h5py.File("retas_2.h5", "r")
 
   print cam.keys()
   graph_x = np.array(0)
@@ -136,13 +136,15 @@ if __name__ == "__main__":
   #exit()
   angulo_aux = 0
 
+  matriz_confusao=np.zeros((21,21))
+
   # skip to highway
-  #for i in range(0, cam['X'].shape[0]):
-  randoms = []
-  randoms = range(0, cam['X'].shape[0])
-  random.shuffle(randoms)
+  for i in range(0, cam['X'].shape[0]):
+  #randoms = []
+  #randoms = range(0, cam['X'].shape[0])
+  #random.shuffle(randoms)
   #print randoms
-  for i in randoms:
+  #for i in randoms:
 
     #if i%100 == 0:
     #  print "%.2f seconds elapsed" % (i/100.0)
@@ -150,11 +152,19 @@ if __name__ == "__main__":
     #print img[None, :, :, :].transpose(0, 3, 1, 2)
     predicted_steers = model.predict(img[None, :, :, :].transpose(0, 1, 2, 3))[0][0]
     predicted_steers = predicted_steers/507.45
+    if predicted_steers > 1:
+      predicted_steers=1
+    elif predicted_steers < -1:
+      predicted_steers=-1
     #predicted_steers = -1 + (1 + 1)*((predicted_steers + 5023)/(5023+5023))
     #print predicted_steers
 
     angle_steers = cam['angle'][i]
     angle_steers = angle_steers/507.45
+    if angle_steers > 1:
+      angle_steers=1
+    elif angle_steers < -1:
+      angle_steers=-1
     #angle_steers = -1 + (1 + 1)*((angle_steers + 5023)/(5023+5023))
     speed_ms = cam['speed'][i]
     print img.shape , cam['dataset_index'][i]
@@ -203,8 +213,13 @@ if __name__ == "__main__":
     pygame.draw.line(orientation, (0, 255, 0), [60, 60], [x, y], 1)
     pygame.display.flip()
     print np.sqrt(((graph_pred - angle_steers) ** 2).mean())/2
-
-    time.sleep(1)
+    matriz_confusao[int(predicted_steers*10)+10][int(angle_steers*10)+10]=matriz_confusao[int(predicted_steers*10)+10][int(angle_steers*10)+10]+1
+    #time.sleep(1)
+  
+  print matriz_confusao
+  plt.imshow(matriz_confusao, cmap='gray')
+  plt.colorbar()
+  plt.show()
 
 plt.figure("angulo")
 plt.plot(graph_x,graph_y,'b-')
