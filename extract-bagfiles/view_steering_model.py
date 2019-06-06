@@ -7,9 +7,9 @@ import pygame
 from pygame.locals import *
 import json
 import os
-#os.environ['KERAS_BACKEND'] = 'tensorflow'
 import math
 import matplotlib.pyplot as plt
+import matplotlib
 from keras.models import model_from_json
 import random
 import time
@@ -117,12 +117,18 @@ if __name__ == "__main__":
   skip = 300
 
   #log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-  cam = h5py.File("retas_2.h5", "r")
+  cam = h5py.File("curvas_em_T_1.h5", "r")
 
   print cam.keys()
   graph_x = np.array(0)
   graph_y = np.array(0)
+  graph_predicted_y = np.array(0)
   graph_pred = np.array(0)
+  erroNRMSE = np.array(0)
+  graph_erro = np.array(0)
+
+  max_and_min=np.array(0)
+  
   position_x = []
   position_y = []
   angulos = [0]
@@ -135,6 +141,13 @@ if __name__ == "__main__":
   #plt.clf()
   #exit()
   angulo_aux = 0
+  for i in range(0, cam['X'].shape[0]):
+    max_and_min = np.append(max_and_min,cam['angle'][i])
+
+  print("O valor maximo e minimo sao {0} e {1} respectivamente...".format(np.amax(max_and_min)/507.45,np.amin(max_and_min)/507.45))
+
+  maximo = np.amax(max_and_min)/507.45
+  minimo = np.amin(max_and_min)/507.45
 
   matriz_confusao=np.zeros((21,21))
 
@@ -167,7 +180,7 @@ if __name__ == "__main__":
       angle_steers=-1
     #angle_steers = -1 + (1 + 1)*((angle_steers + 5023)/(5023+5023))
     speed_ms = cam['speed'][i]
-    print img.shape , cam['dataset_index'][i]
+    #print img.shape , cam['dataset_index'][i]
     pygame.surfarray.blit_array(camera_surface, img.swapaxes(0, 2))
     screen.blit(camera_surface, (0,0))
 
@@ -207,26 +220,39 @@ if __name__ == "__main__":
     x = 60 - 50 * math.cos(math.radians(angulo))
     y = 60 - 50 * math.sin(math.radians(angulo))
     
-    graph_pred = np.append(graph_pred,predicted_steers)
-    print angle_steers,predicted_steers
+    graph_pred = np.append(graph_pred,((angle_steers-predicted_steers)** 2))
+    graph_predicted_y = np.append(graph_predicted_y,predicted_steers)
+
+    #print angle_steers,predicted_steers
     
     pygame.draw.line(orientation, (0, 255, 0), [60, 60], [x, y], 1)
     pygame.display.flip()
-    print np.sqrt(((graph_pred - angle_steers) ** 2).mean())/2
+    graph_erro = np.append(graph_erro,np.sqrt(np.average(graph_pred))/(maximo-minimo))
+    print np.sqrt(np.average(graph_pred))/(maximo-minimo)
+    erroNRMSE = np.append(erroNRMSE,(np.sqrt(((angle_steers-predicted_steers)** 2))/(maximo-minimo)))
     matriz_confusao[int(predicted_steers*10)+10][int(angle_steers*10)+10]=matriz_confusao[int(predicted_steers*10)+10][int(angle_steers*10)+10]+1
-    #time.sleep(1)
+
+    # plt.figure("angulo,angulo_pred and NRMSE")
+    # if np.size(graph_x) <= 200:
+    #   plt.plot(graph_x,graph_y,'r-',graph_x,graph_predicted_y,'b-',graph_x,erroNRMSE,'g-',graph_x,graph_erro,'y*')
+    # else:
+    #   plt.plot(graph_x[i-200:i],graph_y[i-200:i],'r-',graph_x[i-200:i],graph_predicted_y[i-200:i],'b-',graph_x[i-200:i],erroNRMSE[i-200:i],'g-',graph_x[i-200:i],graph_erro[i-200:i],'y*')
+    # plt.ylabel('Estercamento (-1 a 1)')
+    # plt.xlabel('Amostras')
+    # plt.pause(0.000001)
+    # plt.clf()
   
-  print matriz_confusao
-  plt.imshow(matriz_confusao, cmap='gray')
-  plt.colorbar()
+  matriz_confusao[10][10]=0
+  #saving_data = np.array([graph_x,graph_y,graph_predicted_y,erroNRMSE,graph_erro])
+  #np.savetxt('data.csv', zip(graph_x,graph_y,graph_predicted_y,erroNRMSE,graph_erro), delimiter=',',fmt='%.18f')
+
+  plt.figure("angulo,angulo_pred and NRMSE")
+  plt.plot(graph_x,graph_y,'r-',graph_x,graph_predicted_y,'b-',graph_x,erroNRMSE,'g-',graph_x,graph_erro,'k-')
+  plt.ylabel('Estercamento (-1 a 1)')
+  plt.xlabel('Amostras')
   plt.show()
 
-plt.figure("angulo")
-plt.plot(graph_x,graph_y,'b-')
-plt.ylabel('Estercamento (-1 a 1)')
-plt.xlabel('Amostras')
-
-plt.figure("angulo_pred")
-plt.plot(graph_x,graph_pred,'b-')
-plt.ylabel('Estercamento (-1 a 1)')
-plt.xlabel('Amostras')
+  print(np.amax(erroNRMSE))
+  plt.imshow(matriz_confusao, cmap='gray_r')
+  plt.colorbar()
+  plt.show()

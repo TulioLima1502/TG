@@ -186,14 +186,20 @@ if __name__ == "__main__":
 
   # 9 for training
   train_path = [
-    './extract-bagfiles/segundo.h5',
-    './extract-bagfiles/primeiro.h5',
+    './extract-bagfiles/retas_1.h5',
+    './extract-bagfiles/retas_2.h5',
+    './extract-bagfiles/curvas_suaves_1.h5',
+    './extract-bagfiles/curvas_suaves_2.h5',
+    './extract-bagfiles/curvas_em_T_1.h5',
   ]
 
   # 2 for validation
   validation_path = [
-    './extract-bagfiles/segundo.h5',
-    './extract-bagfiles/primeiro.h5',
+    './extract-bagfiles/retas_1.h5',
+    './extract-bagfiles/retas_2.h5',
+    './extract-bagfiles/curvas_suaves_1.h5',
+    './extract-bagfiles/curvas_suaves_2.h5',
+    './extract-bagfiles/curvas_em_T_1.h5',
   ]
 
   if args.validation:

@@ -41,11 +41,48 @@ if __name__ == "__main__":
   model.compile("sgd", "mse")
   weights_file = args.model.replace('json', 'keras')
   model.load_weights(weights_file)
+
   plot_model(model, to_file='model.png')
+
   layers = []
   layer_dict = dict([(layer.name, layer) for layer in model.layers])
     
   keras_layer=layer_dict['dense_2'].output
+  layer_idx = utils.find_layer_idx(model, 'lambda_1')
+
+  model.layers[layer_idx].activation = activations.linear
+  model = utils.apply_modifications(model)
+
+  cam = h5py.File("retas_1.h5", "r")
+
+  for layer in model.layers:
+    layers.append(layer.name)
+
+  for interator in layers:
+    layer_idx = utils.find_layer_idx(model, interator)
+
+    model.layers[layer_idx].activation = activations.linear
+    model = utils.apply_modifications(model)
+
+    img = visualize_activation(model, layer_idx, filter_indices=0)
+    imagem = img.swapaxes(0,2).swapaxes(0,1)
+    print(interator)
+    plt.figure(interator)
+    plt.imshow(imagem)
+  plt.show()
+
+  # for i in range(0, cam['X'].shape[0]):
+  #   img = cam['X'][i]
+  #   print img.shape
+  #   # 20 is the imagenet index corresponding to `ouzel`
+  #   grads = visualize_saliency(model, layer_idx, filter_indices=0, seed_input=img[None, :, :, :].transpose(0, 1, 2, 3), grad_modifier='negate')
+      
+  #   # visualize grads as heatmap
+  #   plt.imshow(grads, cmap='jet')
+  #   print grads.shape
+  #   plt.show()
+  exit()
+
   filter_indices = [1, 2, 3]
   losses = [
       (ActivationMaximization(keras_layer, filter_indices), 1),
