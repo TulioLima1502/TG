@@ -92,6 +92,8 @@ for word in RandomDataValidation:
     DataFileValidation.write(str(word)+'\n')
 DataFileValidation.close()
 
-call('nohup ./server.py --batch 200 --port 5557 --validation --list TrainData.txt &',shell=True)
-call('nohup ./server.py --batch 200 --port 5556 --list TestData.txt &', shell=True)
+exit()
+
+call('nohup ./server.py --batch 200 --port 5556 --validation --list TrainData.txt &',shell=True)
+call('nohup ./server.py --batch 200 --port 5557 --list TestData.txt &', shell=True)
 
