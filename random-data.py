@@ -6,9 +6,10 @@ import os
 TrainData = [
     './extract-bagfiles/retas_1.h5',
     './extract-bagfiles/retas_2.h5',
-    './extract-bagfiles/curvas_suaves_1.h5',
-    './extract-bagfiles/curvas_suaves_2.h5',
-    './extract-bagfiles/curvas_em_T_1.h5',
+    #'./extract-bagfiles/curvas_suaves_1.h5',
+    #'./extract-bagfiles/curvas_suaves_2.h5',
+    #'./extract-bagfiles/curvas_em_T_1.h5',
+    #'./extract-bagfiles/curvas_em_T_2.h5',
 ]
 
 if os.path.isfile("TrainData.txt") is True:
@@ -90,8 +91,6 @@ DataFileValidation = open("ValidationData.txt", "w")
 for word in RandomDataValidation:
     DataFileValidation.write(str(word)+'\n')
 DataFileValidation.close()
-
-exit()
 
 call('nohup ./server.py --batch 50 --port 5557 --validation --list TrainData.txt &',shell=True)
 call('nohup ./server.py --batch 50 --port 5556 --list TestData.txt &', shell=True)

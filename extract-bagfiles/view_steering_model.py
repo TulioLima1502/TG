@@ -117,7 +117,7 @@ if __name__ == "__main__":
   skip = 300
 
   #log = h5py.File("log/2016-06-08--11-46-01.h5", "r")
-  cam = h5py.File("curvas_em_T_1.h5", "r")
+  cam = h5py.File("validacao_retas_2andar_noite.h5", "r")
 
   print cam.keys()
   graph_x = np.array(0)
@@ -247,9 +247,12 @@ if __name__ == "__main__":
   #np.savetxt('data.csv', zip(graph_x,graph_y,graph_predicted_y,erroNRMSE,graph_erro), delimiter=',',fmt='%.18f')
 
   plt.figure("angulo,angulo_pred and NRMSE")
-  plt.plot(graph_x,graph_y,'r-',graph_x,graph_predicted_y,'b-',graph_x,erroNRMSE,'g-',graph_x,graph_erro,'k-')
+  plt.plot(graph_x,graph_y,'r-',graph_x,graph_predicted_y,'k-')
+  #plt.plot(graph_x,graph_y,'r-',graph_x,graph_predicted_y,'b-',graph_x,erroNRMSE,'g-',graph_x,graph_erro,'k-')
   plt.ylabel('Estercamento (-1 a 1)')
   plt.xlabel('Amostras')
+  #plt.ylim(-1,1)
+  plt.xlim(0,cam['X'].shape[0])
   plt.show()
 
   print(np.amax(erroNRMSE))

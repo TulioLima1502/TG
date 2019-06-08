@@ -41,9 +41,10 @@ if __name__ == "__main__":
   validation_path = [
     './extract-bagfiles/retas_1.h5',
     './extract-bagfiles/retas_2.h5',
-    './extract-bagfiles/curvas_suaves_1.h5',
-    './extract-bagfiles/curvas_suaves_2.h5',
-    './extract-bagfiles/curvas_em_T_1.h5',
+    #'./extract-bagfiles/curvas_suaves_1.h5',
+    #'./extract-bagfiles/curvas_suaves_2.h5',
+    #'./extract-bagfiles/curvas_em_T_1.h5',
+    #'./extract-bagfiles/curvas_em_T_1.h5',
   ]
 
   c5x, angle, speed, filters, hdf5_camera = concatenate(validation_path, time_len=1)
@@ -61,10 +62,10 @@ if __name__ == "__main__":
 
   maximo = np.amax(max_and_min)/507.45
   minimo = np.amin(max_and_min)/507.45
-  matriz_confusao=np.zeros((21,21))
+  matriz_confusao=np.zeros((51,51))
 
   for i in sorted(labels_set):
-    print(i)
+    #print(i)
     for es, ee, x in c5x:
       if i >= es and i < ee:
         Imagem = x[i-es]
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     print np.sqrt(np.average(graph_pred))/(maximo-minimo)
 
     erroNRMSE = np.append(erroNRMSE,(np.sqrt(((angle_steers-predicted_steers)** 2))/(maximo-minimo)))
-    matriz_confusao[int(predicted_steers*10)+10][int(angle_steers*10)+10]=matriz_confusao[int(predicted_steers*10)+10][int(angle_steers*10)+10]+1
+    matriz_confusao[int(predicted_steers*25)+25][int(angle_steers*25)+25]=matriz_confusao[int(predicted_steers*25)+25][int(angle_steers*25)+25]+1
 
   #matriz_confusao[10][10]=0
   #saving_data = np.array([graph_x,graph_y,graph_predicted_y,erroNRMSE,graph_erro])
@@ -107,6 +108,10 @@ if __name__ == "__main__":
   plt.show()
 
   print(np.amax(erroNRMSE))
-  plt.imshow(matriz_confusao, cmap='gray_r')
+  np.savetxt('data.mat', matriz_confusao)
+  norm = matplotlib.colors.Normalize(vmin=0, vmax=200)
+  plt.imshow(matriz_confusao, cmap='gray_r',norm=norm)
+  plt.ylabel('Angulo Predito [-1 a 1]')
+  plt.xlabel('Angulo Praticado [-1 a 1]')
   plt.colorbar()
   plt.show()
