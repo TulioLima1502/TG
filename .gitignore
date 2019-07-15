@@ -19,3 +19,7 @@ paper/*.aux
 paper/commalds.tex.backup
 bag-files/*
 extract-bagfiles/*.rar
+extract-bagfiles/*.h5
+extract-bagfiles/keras-vis/*
+extract-bagfiles/matriz de confusão/*
+validacao_*
