@@ -48,7 +48,7 @@ if __name__ == "__main__":
   layer_dict = dict([(layer.name, layer) for layer in model.layers])
     
   keras_layer=layer_dict['dense_2'].output
-  layer_idx = utils.find_layer_idx(model, 'lambda_1')
+  layer_idx = utils.find_layer_idx(model, 'convolution2d_1')
 
   model.layers[layer_idx].activation = activations.linear
   model = utils.apply_modifications(model)
@@ -64,12 +64,12 @@ if __name__ == "__main__":
     model.layers[layer_idx].activation = activations.linear
     model = utils.apply_modifications(model)
 
-    img = visualize_activation(model, layer_idx, filter_indices=0)
+    img = visualize_activation(model, layer_idx, filter_indices=14)
     imagem = img.swapaxes(0,2).swapaxes(0,1)
     print(interator)
     plt.figure(interator)
     plt.imshow(imagem)
-  plt.show()
+    plt.show()
 
   # for i in range(0, cam['X'].shape[0]):
   #   img = cam['X'][i]

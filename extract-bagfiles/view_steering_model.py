@@ -253,6 +253,7 @@ if __name__ == "__main__":
   plt.xlabel('Amostras')
   #plt.ylim(-1,1)
   plt.xlim(0,cam['X'].shape[0])
+  plt.legend(['Realizado', 'Sugerido'])
   plt.show()
 
   print(np.amax(erroNRMSE))

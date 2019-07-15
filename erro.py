@@ -41,10 +41,10 @@ if __name__ == "__main__":
   validation_path = [
     './extract-bagfiles/retas_1.h5',
     './extract-bagfiles/retas_2.h5',
-    #'./extract-bagfiles/curvas_suaves_1.h5',
-    #'./extract-bagfiles/curvas_suaves_2.h5',
+    './extract-bagfiles/curvas_suaves_1.h5',
+    './extract-bagfiles/curvas_suaves_2.h5',
     #'./extract-bagfiles/curvas_em_T_1.h5',
-    #'./extract-bagfiles/curvas_em_T_1.h5',
+    #'./extract-bagfiles/curvas_em_T_2.h5',
   ]
 
   c5x, angle, speed, filters, hdf5_camera = concatenate(validation_path, time_len=1)
@@ -57,24 +57,24 @@ if __name__ == "__main__":
   labels_set = set(labels)
 
   for i in labels_set:
-    max_and_min = np.append(max_and_min,np.copy(angle[i-1:i])[:, None][0][0])
+    max_and_min = np.append(max_and_min,np.copy(angle[i:i+1])[:, None])
   print("O valor maximo e minimo sao {0} e {1} respectivamente...".format(np.amax(max_and_min)/507.45,np.amin(max_and_min)/507.45))
 
   maximo = np.amax(max_and_min)/507.45
   minimo = np.amin(max_and_min)/507.45
-  matriz_confusao=np.zeros((51,51))
+  matriz_confusao=np.zeros((101,101))
 
   for i in sorted(labels_set):
     #print(i)
     for es, ee, x in c5x:
       if i >= es and i < ee:
         Imagem = x[i-es]
-        angle
+        #angle
         break
     #print Imagem.shape
     #time.sleep(1)
     predicted_steers = model.predict(Imagem[None, :, :, :].transpose(0, 1, 2, 3))[0][0]
-    angle_steers = np.copy(angle[i-1:i])[:, None][0][0]
+    angle_steers = np.copy(angle[i:i+1])[:, None]
     predicted_steers = predicted_steers/507.45
     angle_steers = angle_steers/507.45
     #print predicted_steers, angle_steers
@@ -92,11 +92,11 @@ if __name__ == "__main__":
     graph_pred = np.append(graph_pred,((angle_steers-predicted_steers)** 2))
     graph_erro = np.append(graph_erro,np.sqrt(np.average(graph_pred))/(maximo-minimo))
 
-    print np.sqrt(np.average(graph_pred))/(maximo-minimo)
+    #print np.sqrt(np.average(graph_pred))/(maximo-minimo)
 
     erroNRMSE = np.append(erroNRMSE,(np.sqrt(((angle_steers-predicted_steers)** 2))/(maximo-minimo)))
-    matriz_confusao[int(predicted_steers*25)+25][int(angle_steers*25)+25]=matriz_confusao[int(predicted_steers*25)+25][int(angle_steers*25)+25]+1
-
+    matriz_confusao[int(predicted_steers*50)+50][int(angle_steers*50)+50]=matriz_confusao[int(predicted_steers*50)+50][int(angle_steers*50)+50]+1
+  print np.sqrt(np.average(graph_pred))/(maximo-minimo)
   #matriz_confusao[10][10]=0
   #saving_data = np.array([graph_x,graph_y,graph_predicted_y,erroNRMSE,graph_erro])
   #np.savetxt('data.csv', zip(graph_x,graph_y,graph_predicted_y,erroNRMSE,graph_erro), delimiter=',',fmt='%.18f')
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
   print(np.amax(erroNRMSE))
   np.savetxt('data.mat', matriz_confusao)
-  norm = matplotlib.colors.Normalize(vmin=0, vmax=200)
+  norm = matplotlib.colors.Normalize(vmin=0, vmax=100)
   plt.imshow(matriz_confusao, cmap='gray_r',norm=norm)
   plt.ylabel('Angulo Predito [-1 a 1]')
   plt.xlabel('Angulo Praticado [-1 a 1]')

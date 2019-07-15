@@ -6,8 +6,8 @@ import os
 TrainData = [
     './extract-bagfiles/retas_1.h5',
     './extract-bagfiles/retas_2.h5',
-    #'./extract-bagfiles/curvas_suaves_1.h5',
-    #'./extract-bagfiles/curvas_suaves_2.h5',
+    './extract-bagfiles/curvas_suaves_1.h5',
+    './extract-bagfiles/curvas_suaves_2.h5',
     #'./extract-bagfiles/curvas_em_T_1.h5',
     #'./extract-bagfiles/curvas_em_T_2.h5',
 ]
