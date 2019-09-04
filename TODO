@@ -20,3 +20,7 @@ Qual o formato de c5x, angle, speed, filters, hdf5_camera?
 
 Características do código:
     - dask_generator é utilizada para disponibilizar pacotes dados para que o servidor utilize
+
+
+-> Fazer a modificação no ReadMe para explicar do que se trata essa adaptação
+-> Fazer a modificação no SelfSteering para explicar como executar o código
